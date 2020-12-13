@@ -46,7 +46,7 @@ score = 100
 
 objects_that_we_want_to_blit = [
     player,
-    # bad_guy
+    bad_guy
 ]
 
 def blit_object(blittable_object):

@@ -6,7 +6,7 @@ from pygame import mixer
 pygame.init()
 
 
-screen = pygame.display.set_mode((2000, 1569))
+screen = pygame.display.set_mode((600, 600))
 
 
 # mixer.music.load('')
@@ -14,40 +14,41 @@ screen = pygame.display.set_mode((2000, 1569))
 
 pygame.display.set_caption("Space Invaders")
 font = pygame.font.Font('freesansbold.ttf', 64)
-
+player_surface = pygame.image.load('spaceship.png')
+player_surface = pygame.transform.scale(player_surface, (130,100))
 player = {
-    'blit_object': pygame.image.load('spaceship.png'),
-    'x': 500,
-    'y': 1200,
+    'blit_object': player_surface,
+    'x': 250,
+    'y': 500,
     'x_speed': 0,
     'y_speed': 0
 }
-
+bad_guy_surface = pygame.image.load('bad_guy.png')
+bad_guy_surface = pygame.transform.scale(bad_guy_surface, (100,100))
 bad_guy = {
-    'blit_object': pygame.image.load('bad_guy.png'),
-    'x': 100,
-    'y': 0,
-    'x_speed': 10,
+    'blit_object': bad_guy_surface,
+    'x': 250,
+    'y': 100,
+    'x_speed': 1,
     'y_speed': 0
 }
 
-def shoot_bullet(player, objects_that_we_want_to_blit):
+def shoot_bullet(player, bullets_we_want_to_blit):
+    bullet_surface = pygame.image.load('bullet.png')
+    bullet_surface = pygame.transform.scale(bullet_surface, (30,30))
     bullet = {
-        'blit_object': pygame.transform.rotate(pygame.image.load('bullet.png'), -90),
-        'x': player['x'] + 150,
+        'blit_object': pygame.transform.rotate(bullet_surface, -90),
+        'x': player['x'] + 50,
         'y': player['y'],
         'x_speed': 0,
-        'y_speed': -10
+        'y_speed': -3
     }
-    objects_that_we_want_to_blit.append(bullet)
+    bullets_we_want_to_blit.append(bullet)
 
 
-score = 100
 
-objects_that_we_want_to_blit = [
-    player,
-    bad_guy
-]
+
+bullets_we_want_to_blit = []
 
 def blit_object(blittable_object):
     screen.blit(blittable_object['blit_object'], (blittable_object['x'], blittable_object['y']))
@@ -56,9 +57,10 @@ def move_object(blittable_object):
     blittable_object['x'] += blittable_object['x_speed']
     blittable_object['y'] += blittable_object['y_speed']
 
-# def show_score():
-#     score_text = font.render("Score: " + str(score), True, (250, 250, 250))
-#     screen.blit(score_text, (150, 100))
+score = 0
+def show_score():
+    score_text = font.render("Score: " + str(score), True, (0, 0, 0))
+    screen.blit(score_text, (0, 0))
 
 running = True
 r = 255
@@ -81,7 +83,7 @@ while running:
             if event.key == pygame.K_RIGHT:
                 player['x_speed'] = 8
             if event.key == 13:
-                shoot_bullet(player, objects_that_we_want_to_blit)
+                shoot_bullet(player, bullets_we_want_to_blit)
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
                 player['x_speed'] = 0
@@ -90,26 +92,45 @@ while running:
 
     if player['x'] <= 50:
         player['x'] = 50
-    if player['x'] >= 1500:
-        player['x'] = 1500
+    if player['x'] >= 500:
+        player['x'] = 500
 
     if bad_guy['x'] <= 50:
         bad_guy['x_speed'] = bad_guy['x_speed'] * -1
-    if bad_guy['x'] >= 1500:
+    if bad_guy['x'] >= 500:
         bad_guy['x_speed'] = bad_guy['x_speed'] * -1
 
     temp_list = []
-    for blittable_object in objects_that_we_want_to_blit:
+    was_our_bad_guy_hit = False
+    right_boundary = bad_guy['x'] + 20
+    left_boundary = bad_guy['x'] - 20
+    upper_boundary = bad_guy['y'] - 20
+    lower_boundary = bad_guy['y'] + 20
+
+    for bullet in bullets_we_want_to_blit:
+        
+        if bullet['x'] > left_boundary and bullet['x'] < right_boundary and bullet['y'] > lower_boundary and bullet['y'] < upper_boundary:
+            was_our_bad_guy_hit = True
+            score += 1
+
+    if was_our_bad_guy_hit == False:
+        blit_object(bad_guy)
+        move_object(bad_guy)
+
+    blit_object(player)
+    move_object(player)
+        
+    for blittable_object in bullets_we_want_to_blit:
         blit_object(blittable_object)
         move_object(blittable_object)
         temp_list.append(blittable_object)
 
-    objects_that_we_want_to_blit = []
+    bullets_we_want_to_blit = []
     for blittable_object in temp_list:
-        if blittable_object['x'] > 0 and blittable_object['y'] > 0 and blittable_object['x'] < 2000 and blittable_object['y'] < 1569:
-            objects_that_we_want_to_blit.append(blittable_object)
+        if blittable_object['x'] > 0 and blittable_object['y'] > 0 and blittable_object['x'] < 600 and blittable_object['y'] < 600:
+            bullets_we_want_to_blit.append(blittable_object)
 
 
-    # show_score()
+    show_score()
 
     pygame.display.update()

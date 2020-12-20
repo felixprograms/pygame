@@ -4,10 +4,8 @@ import math
 from pygame import mixer
 
 pygame.init()
-
-
+clock = pygame.time.Clock()
 screen = pygame.display.set_mode((600, 600))
-
 
 # mixer.music.load('')
 # mixer.music.play(-1)
@@ -15,7 +13,6 @@ screen = pygame.display.set_mode((600, 600))
 pygame.display.set_caption("Space Invaders")
 font = pygame.font.Font('freesansbold.ttf', 64)
 player_surface = pygame.image.load('spaceship.png')
-player_surface = pygame.transform.scale(player_surface, (130,100))
 player = {
     'blit_object': player_surface,
     'x': 250,
@@ -24,7 +21,6 @@ player = {
     'y_speed': 0
 }
 bad_guy_surface = pygame.image.load('bad_guy.png')
-bad_guy_surface = pygame.transform.scale(bad_guy_surface, (100,100))
 bad_guy = {
     'blit_object': bad_guy_surface,
     'x': 250,
@@ -35,18 +31,14 @@ bad_guy = {
 
 def shoot_bullet(player, bullets_we_want_to_blit):
     bullet_surface = pygame.image.load('bullet.png')
-    bullet_surface = pygame.transform.scale(bullet_surface, (30,30))
     bullet = {
-        'blit_object': pygame.transform.rotate(bullet_surface, -90),
+        'blit_object': bullet_surface,
         'x': player['x'] + 50,
         'y': player['y'],
         'x_speed': 0,
         'y_speed': -3
     }
     bullets_we_want_to_blit.append(bullet)
-
-
-
 
 bullets_we_want_to_blit = []
 
@@ -67,10 +59,10 @@ r = 255
 g = 255
 b = 255
 while running:
-    # rgb
-    # red green blue
-    screen.fill((r, g, b))
+    clock.tick(120)
 
+    # RGB: red green blue
+    screen.fill((r, g, b))
     # screen.blit(background, (0, 0))
 
     for event in pygame.event.get():
@@ -102,14 +94,15 @@ while running:
 
     temp_list = []
     was_our_bad_guy_hit = False
-    right_boundary = bad_guy['x'] + 20
-    left_boundary = bad_guy['x'] - 20
-    upper_boundary = bad_guy['y'] - 20
-    lower_boundary = bad_guy['y'] + 20
+    right_boundary = bad_guy['x'] + 50
+    left_boundary = bad_guy['x'] - 50
+    upper_boundary = bad_guy['y'] - 50
+    lower_boundary = bad_guy['y'] + 50
 
     for bullet in bullets_we_want_to_blit:
-        
-        if bullet['x'] > left_boundary and bullet['x'] < right_boundary and bullet['y'] > lower_boundary and bullet['y'] < upper_boundary:
+        bullet_x = bullet['x']
+        bullet_y = bullet['y']
+        if bullet_x > left_boundary and bullet_x < right_boundary and bullet_y > upper_boundary and bullet_y < lower_boundary:
             was_our_bad_guy_hit = True
             score += 1
 
@@ -119,7 +112,7 @@ while running:
 
     blit_object(player)
     move_object(player)
-        
+
     for blittable_object in bullets_we_want_to_blit:
         blit_object(blittable_object)
         move_object(blittable_object)

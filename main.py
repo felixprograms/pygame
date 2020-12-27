@@ -6,8 +6,8 @@ pygame.init()
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((600, 600))
 
-# mixer.music.load('')
-# mixer.music.play(-1)
+soundObj = pygame.mixer.Sound('1.wav')
+
 
 pygame.display.set_caption("Space Invaders")
 font = pygame.font.Font('freesansbold.ttf', 64)
@@ -37,6 +37,7 @@ def shoot_bullet(player, bullets_we_want_to_blit):
         'x_speed': 0,
         'y_speed': -3
     }
+    soundObj.play()
     bullets_we_want_to_blit.append(bullet)
 
 bullets_we_want_to_blit = []
@@ -75,8 +76,7 @@ while running:
                 player['x_speed'] = 8
             if event.key == 13:
                 shoot_bullet(player, bullets_we_want_to_blit)
-                sound = pygame.mixer.Sound('./weapon_sound_effect.mid')
-                sound.play
+
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
                 player['x_speed'] = 0

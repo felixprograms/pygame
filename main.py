@@ -2,7 +2,6 @@ import pygame
 import random
 import math
 from pygame import mixer
-
 pygame.init()
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((600, 600))
@@ -76,6 +75,8 @@ while running:
                 player['x_speed'] = 8
             if event.key == 13:
                 shoot_bullet(player, bullets_we_want_to_blit)
+                sound = pygame.mixer.Sound('./weapon_sound_effect.mid')
+                sound.play
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
                 player['x_speed'] = 0

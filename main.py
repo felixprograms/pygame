@@ -6,7 +6,7 @@ from pygame import mixer
 pygame.init()
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((600, 600))
-soundObject = pygame.mixer.Sound('1.wav')
+soundObject = pygame.mixer.Sound('sound.wav')
 pygame.display.set_caption("Space Invaders")
 font = pygame.font.Font('freesansbold.ttf', 32)
 
@@ -69,10 +69,10 @@ def show_score():
     score_text = font.render("Score: " + str(score), True, (0, 0, 0))
     screen.blit(score_text, (0, 0))
 
-lives = 3
+lives = 10
 def show_lives():
-    lives_text = font.render("Score: " + str(lives), True, (0, 0, 0))
-    screen.blit(lives_text, (0, 0))
+    lives_text = font.render("Lives: " + str(lives), True, (0, 0, 0))
+    screen.blit(lives_text, (450, 0))
 
 
 running = True
@@ -143,7 +143,7 @@ while running:
         bullet_y = bullet['y']
         if bullet_x > left_boundary and bullet_x < right_boundary and bullet_y > upper_boundary and bullet_y < lower_boundary:
             was_our_player_hit = True
-            amount_of_lives -= 1
+            lives -= 1
         
     if was_our_bad_guy_hit == False:
         blit_object(bad_guy)
@@ -170,5 +170,10 @@ while running:
         bad_guy_shoot_bullet(bad_guy, unfriendly_bullets)
         last_bad_guy_bullet_time = pygame.time.get_ticks()
 
+    if lives == 0
+
+
+
     show_score()
+    show_lives()
     pygame.display.update()

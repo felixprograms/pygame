@@ -28,19 +28,23 @@ bad_guy = {
     'y_speed': 0
 }
 
-def shoot_bullet(player, bullets_we_want_to_blit):
+
+friendly_bullets = []
+unfriendly_bullets = []
+
+
+def shoot_bullet(player, friendly_bullets):
     bullet_surface = pygame.image.load('bullet.png')
+    #bullet_surface = pygame.transform.rotate(bullet_surface, 180)
     bullet = {
         'blit_object': bullet_surface,
         'x': player['x'] + 50,
         'y': player['y'],
         'x_speed': 0,
-        'y_speed': -3
+        'y_speed': -0.3
     }
     soundObj.play()
-    bullets_we_want_to_blit.append(bullet)
-
-bullets_we_want_to_blit = []
+    friendly_bullets.append(bullet)
 
 def blit_object(blittable_object):
     screen.blit(blittable_object['blit_object'], (blittable_object['x'], blittable_object['y']))
@@ -58,8 +62,9 @@ running = True
 r = 255
 g = 255
 b = 255
+last_bullet_time = None
 while running:
-    clock.tick(120)
+    clock.tick(70)
 
     # RGB: red green blue
     screen.fill((r, g, b))
@@ -75,7 +80,9 @@ while running:
             if event.key == pygame.K_RIGHT:
                 player['x_speed'] = 8
             if event.key == 13:
-                shoot_bullet(player, bullets_we_want_to_blit)
+                if last_bullet_time == None or pygame.time.get_ticks() - last_bullet_time > 2000:
+                    shoot_bullet(player, friendly_bullets)
+                    last_bullet_time = pygame.time.get_ticks()
 
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
@@ -100,13 +107,22 @@ while running:
     upper_boundary = bad_guy['y'] - 50
     lower_boundary = bad_guy['y'] + 50
 
-    for bullet in bullets_we_want_to_blit:
+    
+
+    for bullet in friendly_bullets:
         bullet_x = bullet['x']
         bullet_y = bullet['y']
         if bullet_x > left_boundary and bullet_x < right_boundary and bullet_y > upper_boundary and bullet_y < lower_boundary:
             was_our_bad_guy_hit = True
             score += 1
 
+    for bullet in unfriendly_bullets:
+        bullet_x = bullet['x']
+        bullet_y = bullet['y']
+        if bullet_x > left_boundary and bullet_x < right_boundary and bullet_y > upper_boundary and bullet_y < lower_boundary:
+            was_our_bad_guy_hit = True
+            score -= 1
+        
     if was_our_bad_guy_hit == False:
         blit_object(bad_guy)
         move_object(bad_guy)
@@ -114,15 +130,21 @@ while running:
     blit_object(player)
     move_object(player)
 
-    for blittable_object in bullets_we_want_to_blit:
+
+    for blittable_object in friendly_bullets:
         blit_object(blittable_object)
         move_object(blittable_object)
         temp_list.append(blittable_object)
 
-    bullets_we_want_to_blit = []
+    for blittable_object in unfriendly_bullets:
+        blit_object(blittable_object)
+        move_object(blittable_object) 
+        
+        temp_list.append(blittable_object)    
+
     for blittable_object in temp_list:
         if blittable_object['x'] > 0 and blittable_object['y'] > 0 and blittable_object['x'] < 600 and blittable_object['y'] < 600:
-            bullets_we_want_to_blit.append(blittable_object)
+            friendly_bullets.append(blittable_object)
 
 
     show_score()

@@ -6,7 +6,7 @@ pygame.init()
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((600, 600))
 
-soundObj = pygame.mixer.Sound('1.wav')
+soundObject = pygame.mixer.Sound('1.wav')
 
 
 pygame.display.set_caption("Space Invaders")
@@ -31,20 +31,31 @@ bad_guy = {
 
 friendly_bullets = []
 unfriendly_bullets = []
-
+amount_of_lives = 3
 
 def shoot_bullet(player, friendly_bullets):
     bullet_surface = pygame.image.load('bullet.png')
-    #bullet_surface = pygame.transform.rotate(bullet_surface, 180)
     bullet = {
         'blit_object': bullet_surface,
         'x': player['x'] + 50,
         'y': player['y'],
         'x_speed': 0,
-        'y_speed': -0.3
+        'y_speed': -4
     }
-    soundObj.play()
+    soundObject.play()
     friendly_bullets.append(bullet)
+
+def bad_guy_shoot_bullet(bad_guy, unfriendly_bullets):
+    bullet_surface = pygame.image.load('bullet.png')
+    bullet_surface = pygame.transform.rotate(bullet_surface, 180)
+    bullet = {
+        'blit_object': bullet_surface,
+        'x': bad_guy['x'] + 50,
+        'y': bad_guy['y'],
+        'x_speed': 0,
+        'y_speed': 4
+    }
+    unfriendly_bullets.append(bullet)
 
 def blit_object(blittable_object):
     screen.blit(blittable_object['blit_object'], (blittable_object['x'], blittable_object['y']))
@@ -63,6 +74,7 @@ r = 255
 g = 255
 b = 255
 last_bullet_time = None
+last_bad_guy_bullet_time = None
 while running:
     clock.tick(70)
 
@@ -80,7 +92,7 @@ while running:
             if event.key == pygame.K_RIGHT:
                 player['x_speed'] = 8
             if event.key == 13:
-                if last_bullet_time == None or pygame.time.get_ticks() - last_bullet_time > 2000:
+                if last_bullet_time == None or pygame.time.get_ticks() - last_bullet_time > 500:
                     shoot_bullet(player, friendly_bullets)
                     last_bullet_time = pygame.time.get_ticks()
 
@@ -102,6 +114,7 @@ while running:
 
     temp_list = []
     was_our_bad_guy_hit = False
+    was_our_player_hit = False
     right_boundary = bad_guy['x'] + 50
     left_boundary = bad_guy['x'] - 50
     upper_boundary = bad_guy['y'] - 50
@@ -116,19 +129,28 @@ while running:
             was_our_bad_guy_hit = True
             score += 1
 
+
+    right_boundary = player['x'] + 130
+    left_boundary = player['x']
+    upper_boundary = player['y']
+    lower_boundary = player['y'] + 98
+
+
     for bullet in unfriendly_bullets:
         bullet_x = bullet['x']
         bullet_y = bullet['y']
         if bullet_x > left_boundary and bullet_x < right_boundary and bullet_y > upper_boundary and bullet_y < lower_boundary:
-            was_our_bad_guy_hit = True
-            score -= 1
+            was_our_player_hit = True
+            amount_of_lives -= 1
         
     if was_our_bad_guy_hit == False:
         blit_object(bad_guy)
         move_object(bad_guy)
 
-    blit_object(player)
-    move_object(player)
+        
+    if was_our_player_hit == False:
+        blit_object(player)
+        move_object(player)
 
 
     for blittable_object in friendly_bullets:
@@ -142,9 +164,10 @@ while running:
         
         temp_list.append(blittable_object)    
 
-    for blittable_object in temp_list:
-        if blittable_object['x'] > 0 and blittable_object['y'] > 0 and blittable_object['x'] < 600 and blittable_object['y'] < 600:
-            friendly_bullets.append(blittable_object)
+    
+    if last_bad_guy_bullet_time == None or pygame.time.get_ticks() - last_bad_guy_bullet_time > 500:
+        bad_guy_shoot_bullet(bad_guy, unfriendly_bullets)
+        last_bad_guy_bullet_time = pygame.time.get_ticks()
 
 
     show_score()

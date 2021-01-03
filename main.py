@@ -2,16 +2,16 @@ import pygame
 import random
 import math
 from pygame import mixer
+
 pygame.init()
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((600, 600))
-
 soundObject = pygame.mixer.Sound('1.wav')
-
-
 pygame.display.set_caption("Space Invaders")
-font = pygame.font.Font('freesansbold.ttf', 64)
-player_surface = pygame.image.load('spaceship.png')
+font = pygame.font.Font('freesansbold.ttf', 32)
+
+
+player_surface = pygame.image.load('player.png')
 player = {
     'blit_object': player_surface,
     'x': 250,
@@ -19,6 +19,7 @@ player = {
     'x_speed': 0,
     'y_speed': 0
 }
+
 bad_guy_surface = pygame.image.load('bad_guy.png')
 bad_guy = {
     'blit_object': bad_guy_surface,
@@ -28,10 +29,9 @@ bad_guy = {
     'y_speed': 0
 }
 
-
 friendly_bullets = []
 unfriendly_bullets = []
-amount_of_lives = 3
+
 
 def shoot_bullet(player, friendly_bullets):
     bullet_surface = pygame.image.load('bullet.png')
@@ -69,6 +69,12 @@ def show_score():
     score_text = font.render("Score: " + str(score), True, (0, 0, 0))
     screen.blit(score_text, (0, 0))
 
+lives = 3
+def show_lives():
+    lives_text = font.render("Score: " + str(lives), True, (0, 0, 0))
+    screen.blit(lives_text, (0, 0))
+
+
 running = True
 r = 255
 g = 255
@@ -77,10 +83,7 @@ last_bullet_time = None
 last_bad_guy_bullet_time = None
 while running:
     clock.tick(70)
-
-    # RGB: red green blue
     screen.fill((r, g, b))
-    # screen.blit(background, (0, 0))
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -115,12 +118,12 @@ while running:
     temp_list = []
     was_our_bad_guy_hit = False
     was_our_player_hit = False
+
+
     right_boundary = bad_guy['x'] + 50
     left_boundary = bad_guy['x'] - 50
     upper_boundary = bad_guy['y'] - 50
     lower_boundary = bad_guy['y'] + 50
-
-    
 
     for bullet in friendly_bullets:
         bullet_x = bullet['x']
@@ -134,7 +137,6 @@ while running:
     left_boundary = player['x']
     upper_boundary = player['y']
     lower_boundary = player['y'] + 98
-
 
     for bullet in unfriendly_bullets:
         bullet_x = bullet['x']
@@ -161,7 +163,6 @@ while running:
     for blittable_object in unfriendly_bullets:
         blit_object(blittable_object)
         move_object(blittable_object) 
-        
         temp_list.append(blittable_object)    
 
     
@@ -169,7 +170,5 @@ while running:
         bad_guy_shoot_bullet(bad_guy, unfriendly_bullets)
         last_bad_guy_bullet_time = pygame.time.get_ticks()
 
-
     show_score()
-
     pygame.display.update()
